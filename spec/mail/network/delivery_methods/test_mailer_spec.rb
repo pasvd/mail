@@ -22,7 +22,7 @@ describe "Mail::TestMailer" do
     end
     Mail::TestMailer.deliveries.should be_empty
   end
-  
+
   it "should deliver an email to the Mail::TestMailer.deliveries array" do
     Mail.defaults do
       delivery_method :test
@@ -37,7 +37,7 @@ describe "Mail::TestMailer" do
     Mail::TestMailer.deliveries.length.should eq 1
     Mail::TestMailer.deliveries.first.should eq mail
   end
-  
+
   it "should clear the deliveries when told to" do
     Mail.defaults do
       delivery_method :test
@@ -64,7 +64,7 @@ describe "Mail::TestMailer" do
         subject "Email with no sender"
         body "body"
       end
-    end.should raise_error('A sender (Return-Path, Sender or From) required to send a message')
+    end.should raise_error('An SMTP From address is required to send a message. Set the message smtp_envelope_from, return_path, sender, or from address.')
   end
 
   it "should raise an error if no recipient if defined" do
@@ -77,7 +77,10 @@ describe "Mail::TestMailer" do
         subject "Email with no recipient"
         body "body"
       end
-    end.should raise_error('At least one recipient (To, Cc or Bcc) is required to send a message')
+    end.should raise_error('An SMTP To address is required to send a message. Set the message smtp_envelope_to, to, cc, or bcc address.')
   end
 
+  it "should save settings passed to initialize" do
+    Mail::TestMailer.new(:setting => true).settings.should include(:setting => true)
+  end
 end
