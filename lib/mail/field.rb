@@ -181,10 +181,17 @@ module Mail
     private
 
     def split(raw_field)
-      match_data = raw_field.mb_chars.match(FIELD_SPLIT)
-      [match_data[1].to_s.mb_chars.strip, match_data[2].to_s.mb_chars.strip]
-    rescue
-      STDERR.puts "WARNING: Could not parse (and so ignoring) '#{raw_field}'"
+      begin
+        match_data = raw_field.mb_chars.match(FIELD_SPLIT)
+        [match_data[1].to_s.mb_chars.strip, match_data[2].to_s.mb_chars.strip]
+      rescue
+        begin
+          match_data = raw_field.force_encoding("iso-8859-2").encode("UTF-8").mb_chars.match(FIELD_SPLIT)
+          [match_data[1].to_s.mb_chars.strip, match_data[2].to_s.mb_chars.strip]
+        rescue
+          STDERR.puts "WARNING: Could not parse (and so ignoring) '#{raw_field}'"
+        end
+      end
     end
 
     def create_field(name, value, charset)
